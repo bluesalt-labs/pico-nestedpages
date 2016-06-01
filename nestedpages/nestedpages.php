@@ -9,12 +9,18 @@
     another page into the current one. For example:
 
     hello @[/content/otherpage.md] there
+
+    Edited May 2016 by BlueSalt Labs - Updates to Pico 1.0
 */
 
-class Nestedpages {
-  
-  public function before_parse_content(&$content)
+class Nestedpages extends AbstractPicoPlugin {
+
+  protected $enabled = true;
+  protected $dependsOn = array();
+
+  public function onContentParsing(&$content)
   {
+    $pico = $this->getPico();
     // Look for an unescaped @[...] (not \@[...] or @\[...\] or @[...\])
     // "not \, @[, not ] for a long time, not \], ]"
     preg_match_all('/[^\\\]@\[([^\]]*[^\\\])\]/', $content, $matches);
@@ -28,10 +34,15 @@ class Nestedpages {
         # file in your page, although it'll get MD rendered. It means
         # you can use sub-pages that aren't considered pages by Pico
         # though.
-        $full_path = preg_replace('/\.\./','', CONTENT_DIR . "/$path");
+        $full_path = preg_replace('/\.\./','', $pico->getConfig()['content_dir'] . "/$path");
         $full_path = preg_replace('/\/+/','/', $full_path);
         if(file_exists($full_path)) {
           $sub = file_get_contents($full_path);
+
+          # Use Pico's Meta processor to remove subpage meta,
+          # because this doesn't happen for some reason.
+          $sub = $pico->prepareFileContent($sub, array());
+
           # Now sub it into the original
           $pattern = preg_quote($path, '/');
           $content = preg_replace("/@\[$pattern\]/", $sub, $content);
