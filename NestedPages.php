@@ -13,7 +13,7 @@
     Edited May 2016 by BlueSalt Labs - Updates to Pico 1.0
 */
 
-class Nestedpages extends AbstractPicoPlugin {
+class NestedPages extends AbstractPicoPlugin {
 
   protected $enabled = true;
   protected $dependsOn = array();
