@@ -11,19 +11,27 @@
     hello @[/content/otherpage.md] there
 
     Edited May 2016 by BlueSalt Labs - Updates to Pico 1.0
+    Edited August 2018 by Brian Goncalves - Updates to Pico 2.0
 */
 
-class NestedPages extends AbstractPicoPlugin {
+class PicoNestedPages extends AbstractPicoPlugin
+{
+  /**
+    * API version used by this plugin
+    *
+    * @var int
+    */
+  const API_VERSION = 2;
 
   protected $enabled = true;
   protected $dependsOn = array();
 
-  public function onContentParsing(&$content)
+  public function onContentPrepared(&$markdown)
   {
     $pico = $this->getPico();
     // Look for an unescaped @[...] (not \@[...] or @\[...\] or @[...\])
     // "not \, @[, not ] for a long time, not \], ]"
-    preg_match_all('/[^\\\]@\[([^\]]*[^\\\])\]/', $content, $matches);
+    preg_match_all('/[^\\\]@\[([^\]]*[^\\\])\]/', $markdown, $matches);
     foreach($matches as $match) {
       foreach($match as $path) {
         # All paths specified have to be relative to the document root.
@@ -45,7 +53,7 @@ class NestedPages extends AbstractPicoPlugin {
 
           # Now sub it into the original
           $pattern = preg_quote($path, '/');
-          $content = preg_replace("/@\[$pattern\]/", $sub, $content);
+          $markdown = preg_replace("/@\[$pattern\]/", $sub, $markdown);
         }
       }
     }
