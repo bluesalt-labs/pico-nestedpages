@@ -53,7 +53,7 @@ class PicoNestedPages extends AbstractPicoPlugin
 
           # Now sub it into the original
           $pattern = preg_quote($path, '/');
-          $markdown = preg_replace("/@\[$pattern\]/", $sub, $markdown);
+          $markdown = preg_replace("/@\[$pattern\]/", addcslashes($sub, '\\$'), $markdown);
         }
       }
     }
